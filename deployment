@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-app-deployment
+  namespace: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank-app
+  template:
+    metadata:
+      labels:
+        app: bank-app
+    spec:
+      containers:
+      - name: bank-app
+        image: your-docker-repo/bank-app:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://user:password@hostname:5432/bankdb"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bank-app-service
+  namespace: bank
+spec:
+  selector:
+    app: bank-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort
